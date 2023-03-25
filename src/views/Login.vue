@@ -1,7 +1,6 @@
 <template>
 <div class="login-body">
   <div class="login-panel">
-    <div>jjh</div>
   <div class="login-title">用户登录</div>
   <el-form :model="formData" :rules="rules" ref="formDataRef">
     <el-form-item prop="account">
@@ -12,7 +11,7 @@
       </el-input>
     </el-form-item>
     <el-form-item prop="password">
-      <el-input v-model="formData.password" placeholder="请输入密码" >
+      <el-input type="password" v-model="formData.password" placeholder="请输入密码" >
         <template #prefix>
           <span class="iconfont icon-password"></span>
         </template>
@@ -20,12 +19,12 @@
     </el-form-item>
     <div class="check-code-panel">
       <el-form-item prop="checkCode">
-      <el-input v-model="formData.checkCode" placeholder="请输入验证码" class="input-panel" />
+      <el-input v-model="formData.checkCode" placeholder="请输入验证码" class="input-panel" @keyup.enter="login" />
       <img :src="checkCodeUrl" class="check-code" @click="changeCheckCode" />
       </el-form-item>
     </div>
     <el-form-item label="">
-      <el-checkbox v-model="formData.rememberMe" :label="true">记住我</el-checkbox>
+      <el-checkbox v-model="formData.rememberMe" :true-label="1">记住我</el-checkbox>
     </el-form-item>
     <el-button type="primary" :style="{width:'100%'}" @click="login">登录</el-button>
   </el-form>
@@ -34,9 +33,13 @@
 </template>
 
 <script setup>
-import { reactive,ref } from 'vue'
+import { getCurrentInstance, reactive,ref } from 'vue'
+import md5 from 'js-md5'
+import VueCookies from 'vue-cookies'
+import {useRouter} from 'vue-router'
 
-
+const {proxy} = getCurrentInstance();
+const router = useRouter();
 const formDataRef = ref();
 const formData = reactive({
   account: '',
@@ -45,11 +48,12 @@ const formData = reactive({
 
 });
 const api={
-  checkCode:"api/checkCode"
+  checkCode:"api/checkCode",
+  login:'login'
 }
 const checkCodeUrl=ref(api.checkCode);
 const changeCheckCode = ()=>{
-  checkCodeUrl.value = api.checkCode + new Date().getTime();
+  checkCodeUrl.value = api.checkCode + "?" + new Date().getTime();
 }
 
 const rules={
@@ -67,10 +71,65 @@ const rules={
   }]
 }
 
+const init = ()=>{
+  const loginInfo = VueCookies.get("loginInfo");
+  if(!loginInfo){
+    return;
+  }
+  Object.assign(formData,loginInfo);
+
+  // document.onkeydown = (e)=>{
+  //   if(e.keyCode!==13){
+  //     return;
+  //   }
+  //   login();
+  // }
+}
+init();
+
 const login =()=>{
-  formDataRef.value.validate((valid)=>{
+  formDataRef.value.validate(async(valid)=>{
     if(!valid){
       return ;
+    }
+
+    let cookiesLoginInfo = VueCookies.get("loginInfo");
+    let cookiesPassword = cookiesLoginInfo ==null ? null : cookiesLoginInfo.password;
+    if(formData.password !== cookiesPassword){
+      formData.password = md5(formData.password);
+    }
+
+    let params={
+      account :formData.account,
+      password: formData.password ,
+      checkCode: formData.checkCode
+    }
+
+    let result = await proxy.Request({
+      url:api.login,
+      params:params,
+      errorCallback:()=>{
+        changeCheckCode();
+      }
+    })
+    if(!result){
+      return;
+    }
+
+    proxy.message.success("登录成功")
+
+    setTimeout(() => {
+      router.push("/home");
+    }, 1500);
+
+    const loginInfo = {
+      account: params.account,
+      password: params.password,
+      rememberMe:formData.rememberMe,
+    }
+    VueCookies.set("userInfo",result.data,0);
+    if(formData.rememberMe==1){
+      VueCookies.set("loginInfo",loginInfo,"7d");
     }
   });
 }

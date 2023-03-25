@@ -1,6 +1,5 @@
 <template>
     <div>
-        <div>kjjgj</div>
         <router-view/>
     </div>
 </template>
