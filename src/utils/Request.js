@@ -59,6 +59,12 @@ const request = (config) =>{
             }
             const responseData = response.data;
             if(responseData.status == 'error'){
+                if(responseData.code==901){
+                    setTimeout(() => {
+                        router.push("/login");
+                    }, 2000);
+                    return Promise.reject("登录超时")
+                }
                 if(config.errorCallback){
                     config.errorCallback();
                 }
@@ -66,11 +72,6 @@ const request = (config) =>{
             }else{
                 if(responseData.code==200){
                     return responseData;
-                }else if(responseData.code==901){
-                    setTimeout(() => {
-                        router.push("/login");
-                    }, 2000);
-                    return Promise.reject("登录超时")
                 }
             }
         },

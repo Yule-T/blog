@@ -2,10 +2,10 @@ import { createRouter ,createWebHistory} from "vue-router";
 import VueCookies from 'vue-cookies'
 
 const routes = [
-    {
-        path:'/',
-        redirect:'/login',
-    },
+    // {
+    //     path:'/',
+    //     redirect:'/login',
+    // },
     {
         name: '首页',
         path: '/login',
@@ -13,8 +13,21 @@ const routes = [
     },
     {
         name: '框架页',
-        path: '/home',
+        path: '/',
         component: () => import('../views/Framework.vue'),
+        redirect:'/blog/list',
+        children: [
+            {
+                path: '/blog/list',
+                name: '博客管理',
+                component: () => import('../views/blog/Blog.vue')
+            },
+            {
+                path: '/blog/category',
+                name: '分类管理',
+                component: () => import('../views/blog/BlogCategory.vue')
+            },
+        ],
     },
 ];
 

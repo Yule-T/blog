@@ -119,7 +119,7 @@ const login =()=>{
     proxy.message.success("登录成功")
 
     setTimeout(() => {
-      router.push("/home");
+      router.push("/");
     }, 1500);
 
     const loginInfo = {
@@ -141,9 +141,9 @@ const login =()=>{
 .login-body{
   width: 100%;
   height: calc(100vh);
+  background-image: url("../assets/login_bg.png");
   background-size: cover;
   background-position: center;
-  background-image: url("../assets/login_bg.png");
 }
 .login-title{
   font-family: "微软雅黑";
@@ -156,7 +156,7 @@ const login =()=>{
 .login-panel{
   padding: 6px 20px 0 20px;
   margin-right: 100px;
-  margin-top: 100px;
+  margin-top: 150px;
   border-radius: 8px;
   box-shadow: 2px 20x 10px rgba(0, 168, 252, 0.548);
   float: right;
