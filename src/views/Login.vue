@@ -116,7 +116,7 @@ const login =()=>{
       return;
     }
 
-    proxy.message.success("登录成功")
+    proxy.Message.success("登录成功")
 
     setTimeout(() => {
       router.push("/");

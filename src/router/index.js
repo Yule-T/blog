@@ -18,9 +18,14 @@ const routes = [
         redirect:'/blog/list',
         children: [
             {
+                path: '/blog/test',
+                name: '测试',
+                component: () => import('../views/blog/Test.vue')
+            },
+            {
                 path: '/blog/list',
                 name: '博客管理',
-                component: () => import('../views/blog/Blog.vue')
+                component: () => import('../views/blog/BlogList.vue')
             },
             {
                 path: '/blog/category',

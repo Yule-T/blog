@@ -2,7 +2,7 @@
   <div class="layout">
     <el-container>
       <el-header class="header">
-        <img src="/src/assets/logo.png" alt="这是俺的博客呀" class="imgLogo">
+        <img src="/src/assets/logo2.png" alt="这是俺的博客呀" class="imgLogo">
         <div class="user-info">
           <span style="color:#  color: #f1f5fb;">欢迎回来，</span> 
           <el-dropdown trigger="click">
@@ -148,7 +148,7 @@ watch(route,(newVal,oldVal) => {
   height: calc(100vh);
   width: 100%;
   font-family: "微软雅黑";
-    /* background-image: url("../assets/vue-bg1.png"); */
+    background-image: url("../assets/vue-bg4.png");
     background-repeat:no-repeat;
     background-size:cover;
 }
@@ -168,7 +168,9 @@ watch(route,(newVal,oldVal) => {
   border-right: 1px solid rgb(255, 255, 255);
 }
 .right-main{
+  position: relative;
   background-color: rgba(249, 245, 252, 0.507);
+  padding: 15px;
 }
 .post-btn{
   width: 100%;
@@ -235,7 +237,7 @@ watch(route,(newVal,oldVal) => {
 .nick-name{
   cursor: pointer;
   font-size: 16px;
-  color: #e9f1fe;
+  color: #498fff;
 }
 .icon-close{
   font-size: 14px;

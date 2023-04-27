@@ -77,7 +77,7 @@ const close= () => {
 .dialog-body{
    border-top: 1px solid rgba(0, 0, 0, 0.099);
    border-bottom: 1px solid rgba(172, 189, 199, 0.247);
-   padding: 10px;
+   padding: 15px 40px 10px 0;
    min-height:80px;
 }
 .dialog-footer{

@@ -104,7 +104,7 @@ body{
 ::-webkit-scrollbar-thumb {
   /*滚动条里面小方块*/
   border-radius   : 10px;
-  background-color:  rgba(31, 40, 43, 0.185);
+  background-color:  rgba(143, 169, 179, 0.315);
   background-image: -webkit-linear-gradient(
       45deg,
       rgba(255, 255, 255, 0.2) 25%,
@@ -119,7 +119,7 @@ body{
 ::-webkit-scrollbar-track {
   /*滚动条里面轨道*/
   box-shadow   : inset 0 0 5px rgba(221, 245, 255, 0.082);
-  background   :#dfcbd6;
+  background   :#ffffff61;
   border-radius: 10px;
 }
 .op{
@@ -129,4 +129,9 @@ body{
 a.a-link{
   text-decoration: none;
   color: #6c93f4;
+}
+.not-allow{
+  cursor: not-allowed;
+  color: #70737b;
+  text-decoration: none;
 }

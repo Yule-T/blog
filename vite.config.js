@@ -4,6 +4,13 @@ import path from "path"
 
 // https://vitejs.dev/config/
 export default defineConfig({
+
+
+    optimizeDeps: {
+      include: ['@kangc/v-md-editor/lib/theme/vuepress.js'],
+    },
+
+
   plugins: [vue()],
   server:{
     hmr: true,

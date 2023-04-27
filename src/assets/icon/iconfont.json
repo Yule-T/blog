@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "35093157",
+      "name": "前进",
+      "font_class": "back",
+      "unicode": "e8bd",
+      "unicode_decimal": 59581
+    },
+    {
       "icon_id": "1388124",
       "name": "open",
       "font_class": "open",
