@@ -17,10 +17,14 @@
         </el-form-item>
         <el-form-item prop="content">
           <div :style="{'width':'100%'}">
-            <EditorMarkdown :height="editMarkHeight"
+            <EditorHtml :height="editHtmlHeight"
+                        v-model="blogFormData.content"
+                        v-if="blogFormData.editorType==0"></EditorHtml>
+      
+            <EditorMarkdown v-else
+                            :height="editMarkHeight"
                             v-model="blogFormData.markdownContent"
                             @htmlContent="setHtmlContent"></EditorMarkdown>
-      <!-- <editorHtml :height="editHtmlHeight"></editorHtml> -->
           </div>
         </el-form-item>
         
@@ -31,14 +35,14 @@
           :buttons="dialogConfig.buttons"
           width="700px"
           @close="dialogConfig.show=false">
-        <el-form :model="settingFormData"
+        <el-form :model="blogFormData"
                    :rules="rules"
-                   ref="settingFormDataRef"
+                   ref="blogFormDataRef"
                    label-width="95px">
           <el-form-item label="博客分类&emsp;"
                         prop="categoryId">
              <el-select placeholder="请选择分类"
-                        v-model="settingFormData.categoryId"
+                        v-model="blogFormData.categoryId"
                         clearable
                         :style="{'width':'100%'}">
                 <el-option :value="item.categoryId" 
@@ -48,25 +52,25 @@
           </el-form-item>
           <el-form-item label="封面&emsp;"
                         prop="cover">
-            <CoverUpload v-model="settingFormData.cover"></CoverUpload>
+            <CoverUpload v-model="blogFormData.cover"></CoverUpload>
           </el-form-item>
           <el-form-item label="博客类型&emsp;"
                         prop="type">
-            <el-radio-group v-model="settingFormData.type">
-              <el-radio :label="1">原创</el-radio>
-              <el-radio :label="0">转载</el-radio>
+            <el-radio-group v-model="blogFormData.type">
+              <el-radio :label="0">原创</el-radio>
+              <el-radio :label="1">转载</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="原文地址&emsp;"
                         prop="reprintUrl"
-                        v-if="settingFormData.type==0">
-            <el-input v-model="settingFormData.reprintUrl"
+                        v-if="blogFormData.type==1">
+            <el-input v-model="blogFormData.reprintUrl"
                       placeholder="请输入原文地址">
             </el-input>
           </el-form-item>
           <el-form-item label="评论&emsp;"
                         prop="allowComment">
-            <el-radio-group v-model="settingFormData.allowComment">
+            <el-radio-group v-model="blogFormData.allowComment">
               <el-radio :label="1">允许</el-radio>
               <el-radio :label="0">不允许</el-radio>
             </el-radio-group>
@@ -74,7 +78,7 @@
           </el-form-item>
           <el-form-item label="博客摘要&emsp;"
                         prop="summary">
-            <el-input v-model="settingFormData.summary"
+            <el-input v-model="blogFormData.summary"
                       type="textarea"
                       placeholder="请输入摘要"
                       :autosize="{minRows:3,maxRows:3}">
@@ -83,14 +87,14 @@
           <el-form-item label="博客标签&emsp;"
                         prop="categoryDesc">
             <div style="display:flex;align-items: center;">
-              <el-tag v-for="(item,index) in settingFormData.tag" :key="index"
+              <el-tag v-for="(item,index) in blogFormData.tag" :key="index"
                       @close="closeTag(index)" closable
                       style="margin-right: 5px;">
                 {{item}}
 
               </el-tag>
               <span class="info2"
-                    v-if="settingFormData.tag.length==0">添加标签，更容易被搜索引擎收录</span>
+                    v-if="blogFormData.tag.length==0">添加标签，更容易被搜索引擎收录</span>
               <el-button :icon="Plus" circle size="small" 
                           @click="showTagInputHandler"
                           v-if="!showTagInput"/>
@@ -109,7 +113,7 @@
 </template>
 
 <script setup>
-import { getCurrentInstance, onMounted, proxyRefs, reactive, ref } from "vue"
+import { getCurrentInstance, nextTick, onMounted, proxyRefs, reactive, ref } from "vue"
 import { Plus} from '@element-plus/icons-vue'
 
 const {proxy} = getCurrentInstance();
@@ -117,15 +121,37 @@ const {proxy} = getCurrentInstance();
 const api ={
   loadAllCategory4Blog:"/category/loadAllCategory4Blog",
   saveBlog:"/blog/saveBlog",
+  getUserInfo:"/getUserInfo"
 }
 
 const editMarkHeight = window.innerHeight - 60 - 30 - 55 -70;
 const editHtmlHeight = window.innerHeight - 60 - 30 - 55 -30 -120;
 
+const init = (type,data) => {
+  
+  windowConfig.show = true
+  nextTick(()=>{
+    blogFormRef.value.resetFields()
+    blogFormData.value = {tag:[]}
+    if(type==="add"){
+      getUserInfo()
+    }
+  })
+}
+defineExpose({init});
+const getUserInfo = async()=>{
+  let result = await proxy.Request({
+    url:api.getUserInfo,
+  })
+  if(!result){
+    return;
+  }
+  blogFormData.value.editorType = result.data.editorType;
+}
+
 //新增 修改
 const windowConfig = reactive({
-  show:true,
-  title:"标题",
+  show:false,
   buttons:[{
     type:"primary",
     text:"确定",
@@ -135,17 +161,15 @@ const windowConfig = reactive({
   }]
 });
 
+const emit = defineEmits()
 const closeWindow = () =>{
   windowConfig.show = false;
-  loadDataList();
-}
-const showEdit = (type,data) =>{
-  windowConfig.show = true;
+  emit("callback");
 }
 
 // 博客正文
 const blogFormRef = ref(null)
-const blogFormData = ref({})
+const blogFormData = ref({tag:[]})
 const rules = {
   title:[{required:true,message:"请输入标题" }],
   content:[{required:true,message:"请输入正文" }],
@@ -171,10 +195,9 @@ const showSettings = () =>{
 }
 
 //设置确定吗
-const settingFormData = ref({tag:[]})
 const dialogConfig = reactive({
   show:false,
-  title:"标题",
+  title:"博客设置",
   buttons:[{
     type:"primary",
     text:"确定",
@@ -205,13 +228,13 @@ const tagInputResult = () => {
     return
   }
   showTagInput.value = false;
-  if(settingFormData.value.tag.indexOf(tagInputValue.value) == -1){
-    settingFormData.value.tag.push(tagInputValue.value);
+  if(blogFormData.value.tag.indexOf(tagInputValue.value) == -1){
+    blogFormData.value.tag.push(tagInputValue.value);
   }
   tagInputValue.value = undefined;
 }
 const closeTag = (index) => {
-settingFormData.value.tag.splice(index, 1)
+blogFormData.value.tag.splice(index, 1)
 }
 //是否显示tag输入框
 const showTagInput = ref(false)
@@ -219,9 +242,9 @@ const showTagInputHandler = () => {
   showTagInput.value = true
 }
 
-const settingFormDataRef = ref()
+const blogFormDataRef = ref()
 const SubmitBlog = () => {
-  settingFormDataRef.value.validate(async (valid) => {
+  blogFormDataRef.value.validate(async (valid) => {
     if(!valid){
       return
     }
@@ -240,8 +263,7 @@ const SubmitBlog = () => {
         // allowComment:blogFormData.blogId,
     }
     Object.assign(params,blogFormData.value);
-    Object.assign(params,settingFormData.value);
-    params.editorType = 1;
+    params.tag = params.tag.join("|")
     let result = await proxy.Request({
       url:api.saveBlog,
       params
@@ -250,6 +272,8 @@ const SubmitBlog = () => {
       return
     }
     proxy.Message.success("保存博客成功")
+    dialogConfig.show=false
+    closeWindow()
   })
 }
 

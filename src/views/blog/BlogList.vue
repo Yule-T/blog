@@ -84,7 +84,7 @@
       </div>
     </template>
     </Table>
-    <BlogEdit></BlogEdit>
+    <BlogEdit ref="blogEditRef" @callback="loadDataList"></BlogEdit>
   </div>
 </template>
 
@@ -170,6 +170,11 @@ const loadDataList = async()=> {
     return
   }
   Object.assign(tableData,result.data);
+}
+
+const blogEditRef = ref(null)
+const showEdit = (type,data) => {
+  blogEditRef.value.init(type,data)
 }
 
 
